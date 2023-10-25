@@ -1,8 +1,12 @@
-from Util.LoadText_Utils import *
+from Utils.fileUtils import get_TextDataset_file_path
+from Utils.RandomUtils import initial_random_seed
+from Utils.PandasUtils import read_file
+
+classes = ['eng','pes']
 
 def LoadText():
-    current_folder_path = get_current_folder_path()
-    TextDataset_file_path = get_TextDataset_file_path(current_folder_path)
-    df = pd.read_csv(TextDataset_file_path)
+    initial_random_seed()
+    TextDataset_file_path = get_TextDataset_file_path()
+    df = read_file(TextDataset_file_path)
     eng_rows = df[df["lan_code"].str.contains(classes[0], case=False)]
     pes_rows = df[df["lan_code"].str.contains(classes[1], case=False)]
