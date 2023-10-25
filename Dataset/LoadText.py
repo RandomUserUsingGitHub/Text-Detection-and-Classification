@@ -1,4 +1,4 @@
-from 
+from Util.LoadText_Utils import *
 
 def LoadText():
     current_folder_path = get_current_folder_path()
