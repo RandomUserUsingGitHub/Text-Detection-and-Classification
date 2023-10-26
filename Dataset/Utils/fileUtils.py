@@ -36,8 +36,11 @@ def define_image_name(label):
 
 def delete_old_dataset():
     current_folder_path = get_current_folder_path()
-    paths = os.listdir(os.path.join(current_folder_path, '..', 'Generated'))
-    for path in paths:
+    generated_path = os.path.join(current_folder_path, '..', 'Generated')
+    files = os.listdir(generated_path)
+
+    for file in files:
+        path = os.path.join(generated_path, file)
         if os.path.isfile(path):
             os.remove(path)
 
