@@ -7,17 +7,17 @@ import warnings
 def create_new_dataset():
     print("Loading the texts...")
     text = loadText()
-    amount = input("How many images? ")
-    generator(text, amount)
+    # amount = int(input("How many images? "))
+    generator(text, amount=5)
 
     
 
 
 def main():
-    create_dataset = input("Create new dataset? (y/n)")
-    if('y' in create_dataset.lower()):
-        create_new_dataset()
-
+    # create_dataset = input("Create new dataset? (y/n) ")
+    # if('y' in create_dataset.lower()):
+    #     create_new_dataset()
+    create_new_dataset()
 
 
 
