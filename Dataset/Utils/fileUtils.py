@@ -30,4 +30,15 @@ def find_files(path, file_extensions):
 
     return file_list
 
+def define_image_name(label):
+    current_folder_path = get_current_folder_path()
+    return os.path.join(current_folder_path, '..', 'Generated', f'{label+1}.png')
+
+def delete_old_dataset():
+    current_folder_path = get_current_folder_path()
+    paths = os.listdir(os.path.join(current_folder_path, '..', 'Generated'))
+    for path in paths:
+        if os.path.isfile(path):
+            os.remove(path)
+
 

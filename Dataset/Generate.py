@@ -1,5 +1,5 @@
 from .TextDataset.Languages import classes
-from .Utils.FileUtils import get_font_file_path, get_backgrounds_file_path, find_files
+from .Utils.FileUtils import get_font_file_path, get_backgrounds_file_path, find_files, define_image_name
 from .Utils.RandomUtils import random_choice, random_number
 
 from PIL import Image, ImageDraw, ImageFont, ImageFilter, ImageEnhance
@@ -89,7 +89,7 @@ def generator(text, amount):
     images = []
     label_and_bbox = []
     labels = []
-
+    counter_for_image_labeling = 0
     for index in selected_eng_texts.index:
         # index = random.choice(rows.index)
         text_to_generate = selected_eng_texts.loc[index, 'sentence']
@@ -99,7 +99,9 @@ def generator(text, amount):
         while(not bool_text_on_screen):
             generated_image = generate_image(text_to_generate, font_folder_path)
         # generated_image.show()
-        image_viewer(generated_image)
+        # image_viewer(generated_image)
+        generated_image.save(define_image_name(counter_for_image_labeling))
+        counter_for_image_labeling += 1
 
 
     for index in selected_pes_texts.index:
@@ -111,6 +113,8 @@ def generator(text, amount):
         while(not bool_text_on_screen):
             generated_image = generate_image(text_to_generate, font_folder_path)
         # generated_image.show()
-        image_viewer(generated_image)
+        # image_viewer(generated_image)
+        generated_image.save(define_image_name(counter_for_image_labeling))
+        counter_for_image_labeling += 1
 
     return images, labels
