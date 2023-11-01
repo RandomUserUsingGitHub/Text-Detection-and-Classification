@@ -2,7 +2,7 @@ from .TextDataset.Languages import classes
 from .Utils.FileUtils import get_font_file_path, get_backgrounds_file_path, find_files, define_image_name
 from .Utils.RandomUtils import random_choice, random_number
 
-from PIL import Image, ImageDraw, ImageFont, ImageFilter, ImageEnhance
+from PIL import Image, ImageDraw, ImageFont
 from arabic_reshaper import reshape
 from bidi.algorithm import get_display
 
@@ -15,6 +15,7 @@ y_ofset = 50
 outer_left_text_spawn = -150
 outer_up_text_spawn = -50
 bounding_box = [0, 0, 0, 0]
+color: int
 
 
 def calculate_true_box(x_min, y_min, x_max, y_max):
@@ -46,18 +47,17 @@ def random_initial_position():
     return random_number(outer_left_text_spawn, image_ratio[0] - x_ofset), random_number(outer_up_text_spawn, image_ratio[1] - y_ofset)
 
 
+
 def generate_image(text_to_generate, font_folder):
     global image, bool_text_on_screen, text
     text = get_display(reshape(text_to_generate))
     font_path = random_choice(find_files(font_folder, ([".ttf", ".otf"])))
-    print(font_path)
     font_size = random_number(font_min, font_max)
     font = ImageFont.truetype(font_path, font_size)
     color = random_number(0, gray_level_max)
     text_color = (color,color,color)
     background_path = find_files(get_backgrounds_file_path(), ([".png"]))
     background_path = random_choice(background_path)
-    print(background_path)
     image = Image.open(background_path)
     image = image.resize((image_ratio[0],image_ratio[1]))
     draw = ImageDraw.Draw(image)
@@ -71,15 +71,21 @@ def generate_image(text_to_generate, font_folder):
 def image_viewer(image):
     import cv2
     import numpy as np
+    outline_color = (0,255,0)
+    width = 2
     pil_array = np.array(image)
     cv2_image = cv2.cvtColor(pil_array, cv2.COLOR_GRAY2BGR)
+    cv2.rectangle(cv2_image, bounding_box, outline_color, width)
     cv2.imshow("Image Viewer", cv2_image)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
 
+def creare_dataset(generated_image, image_ID):
+    generated_image.save(define_image_name(image_ID))
+
+
 def generator(text, amount):
-    print("heeeyyyyy")
     global bool_text_on_screen, counter
     eng_texts, pes_texts = text
 
@@ -89,7 +95,7 @@ def generator(text, amount):
     images = []
     label_and_bbox = []
     labels = []
-    counter_for_image_labeling = 0
+    image_ID = 0
     for index in selected_eng_texts.index:
         # index = random.choice(rows.index)
         text_to_generate = selected_eng_texts.loc[index, 'sentence']
@@ -99,9 +105,9 @@ def generator(text, amount):
         while(not bool_text_on_screen):
             generated_image = generate_image(text_to_generate, font_folder_path)
         # generated_image.show()
-        # image_viewer(generated_image)
-        generated_image.save(define_image_name(counter_for_image_labeling))
-        counter_for_image_labeling += 1
+        image_viewer(generated_image)
+        creare_dataset(generated_image, image_ID)
+        image_ID += 1
 
 
     for index in selected_pes_texts.index:
@@ -113,8 +119,8 @@ def generator(text, amount):
         while(not bool_text_on_screen):
             generated_image = generate_image(text_to_generate, font_folder_path)
         # generated_image.show()
-        # image_viewer(generated_image)
-        generated_image.save(define_image_name(counter_for_image_labeling))
-        counter_for_image_labeling += 1
+        image_viewer(generated_image)
+        creare_dataset(generated_image, image_ID)
+        image_ID += 1
 
     return images, labels

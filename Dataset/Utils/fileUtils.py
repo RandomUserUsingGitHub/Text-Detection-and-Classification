@@ -32,11 +32,11 @@ def find_files(path, file_extensions):
 
 def define_image_name(label):
     current_folder_path = get_current_folder_path()
-    return os.path.join(current_folder_path, '..', 'Generated', f'{label+1}.png')
+    return os.path.join(current_folder_path, '..', 'Dataset', f'{label+1}.png')
 
 def delete_old_dataset():
     current_folder_path = get_current_folder_path()
-    generated_path = os.path.join(current_folder_path, '..', 'Generated')
+    generated_path = os.path.join(current_folder_path, '..', 'Dataset')
     files = os.listdir(generated_path)
 
     for file in files:
