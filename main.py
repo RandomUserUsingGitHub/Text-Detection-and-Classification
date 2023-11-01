@@ -15,7 +15,7 @@ def create_new_dataset():
     print("Loading the texts...")
     text = loadText()
     # amount = int(input("How many images? "))
-    generator(text, amount=5)
+    generator(text, amount=1)
 
     
 
