@@ -41,6 +41,8 @@ def calculate_true_box(x_min, y_min, x_max, y_max):
     if(y_max > image_ratio[1]):
         bounding_box[3] = image_ratio[1]
 
+    print(bounding_box)
+
     return True
 
 def random_initial_position():
@@ -75,7 +77,7 @@ def image_viewer(image):
     width = 2
     pil_array = np.array(image)
     cv2_image = cv2.cvtColor(pil_array, cv2.COLOR_GRAY2BGR)
-    cv2.rectangle(cv2_image, bounding_box, outline_color, width)
+    cv2.rectangle(cv2_image, bounding_box[:2], bounding_box[2:], outline_color, width)
     cv2.imshow("Image Viewer", cv2_image)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
