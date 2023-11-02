@@ -1,6 +1,7 @@
 from Generator.LoadText import loadText
 from Generator.Generate import generator
 from Generator.Utils.FileUtils import delete_old_dataset
+from DataLoader import read_data
 # from DataLoader import parse_csv_row
 
 import warnings
@@ -29,6 +30,7 @@ def main():
 
        
     create_new_dataset()
+    read_data()
 
 
 
