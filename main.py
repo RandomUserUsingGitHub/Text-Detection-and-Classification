@@ -1,6 +1,6 @@
-from Dataset.LoadText import loadText
-from Dataset.Generate import generator
-from Dataset.Utils.FileUtils import delete_old_dataset
+from Generator.LoadText import loadText
+from Generator.Generate import generator
+from Generator.Utils.FileUtils import delete_old_dataset
 
 import warnings
 

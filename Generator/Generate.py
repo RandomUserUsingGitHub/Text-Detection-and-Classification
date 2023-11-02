@@ -6,6 +6,7 @@ from PIL import Image, ImageDraw, ImageFont
 from arabic_reshaper import reshape
 from bidi.algorithm import get_display
 
+
 font_min = 20
 font_max = 70
 gray_level_max = 50
@@ -15,7 +16,6 @@ y_ofset = 50
 outer_left_text_spawn = -150
 outer_up_text_spawn = -50
 bounding_box = [0, 0, 0, 0]
-color: int
 
 
 def calculate_true_box(x_min, y_min, x_max, y_max):
@@ -125,4 +125,3 @@ def generator(text, amount):
         creare_dataset(generated_image, image_ID)
         image_ID += 1
 
-    return images, labels
