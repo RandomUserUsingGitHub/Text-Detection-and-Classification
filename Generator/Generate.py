@@ -1,5 +1,5 @@
 from .TextDataset.Languages import classes
-from .Utils.FileUtils import get_font_file_path, get_backgrounds_file_path, find_files, define_image_name
+from .Utils.FileUtils import get_font_file_path, get_backgrounds_file_path, find_files, define_image_name, define_csv_name
 from .Utils.RandomUtils import random_choice, random_number
 
 from PIL import Image, ImageDraw, ImageFont
@@ -16,6 +16,10 @@ y_ofset = 50
 outer_left_text_spawn = -150
 outer_up_text_spawn = -50
 bounding_box = [0, 0, 0, 0]
+
+names_hist = []
+bbox_hist = []
+class_hist = []
 
 
 def calculate_true_box(x_min, y_min, x_max, y_max):
@@ -83,12 +87,29 @@ def image_viewer(image):
     cv2.destroyAllWindows()
 
 
-def creare_dataset(generated_image, image_ID):
+def creare_dataset(generated_image, image_ID, class_ID):
+    global names_hist, bbox_hist, class_hist
     generated_image.save(define_image_name(image_ID))
+    names_hist.append(f"{image_ID}.png")
+    bbox_hist.append(f"{bounding_box[0]},{bounding_box[1]},{bounding_box[2]},{bounding_box[3]}")
+    class_hist.append(class_ID)
+
+
+def create_scv():
+    import pandas as pd
+    data_dict = {
+        'Image_ID': names_hist,
+        'Bbox': bbox_hist,
+        'Class_Label': class_hist
+    }
+    df = pd.DataFrame(data_dict)
+    df.to_csv(define_csv_name(), index=False, sep=",")
+
+
 
 
 def generator(text, amount):
-    global bool_text_on_screen, counter
+    global bool_text_on_screen
     eng_texts, pes_texts = text
 
     selected_eng_texts = eng_texts.sample(n=amount)
@@ -107,8 +128,8 @@ def generator(text, amount):
         while(not bool_text_on_screen):
             generated_image = generate_image(text_to_generate, font_folder_path)
         # generated_image.show()
-        image_viewer(generated_image)
-        creare_dataset(generated_image, image_ID)
+        # image_viewer(generated_image)
+        creare_dataset(generated_image, image_ID, 0)
         image_ID += 1
 
 
@@ -121,7 +142,9 @@ def generator(text, amount):
         while(not bool_text_on_screen):
             generated_image = generate_image(text_to_generate, font_folder_path)
         # generated_image.show()
-        image_viewer(generated_image)
-        creare_dataset(generated_image, image_ID)
+        # image_viewer(generated_image)
+        creare_dataset(generated_image, image_ID, 1)
         image_ID += 1
+
+    create_scv()
 

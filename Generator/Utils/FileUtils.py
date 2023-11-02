@@ -30,6 +30,10 @@ def find_files(path, file_extensions):
 
     return file_list
 
+def define_csv_name():
+    current_folder_path = get_current_folder_path()
+    return os.path.join(current_folder_path, '..', 'Dataset', 'data.csv')
+
 def define_image_name(label):
     current_folder_path = get_current_folder_path()
     return os.path.join(current_folder_path, '..', 'Dataset', f'{label+1}.png')

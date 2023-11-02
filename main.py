@@ -1,6 +1,7 @@
 from Generator.LoadText import loadText
 from Generator.Generate import generator
 from Generator.Utils.FileUtils import delete_old_dataset
+# from DataLoader import parse_csv_row
 
 import warnings
 
@@ -15,7 +16,7 @@ def create_new_dataset():
     print("Loading the texts...")
     text = loadText()
     # amount = int(input("How many images? "))
-    generator(text, amount=10)
+    generator(text, amount=1)
 
     
 
@@ -28,6 +29,7 @@ def main():
 
        
     create_new_dataset()
+
 
 
 
