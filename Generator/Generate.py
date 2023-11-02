@@ -45,8 +45,6 @@ def calculate_true_box(x_min, y_min, x_max, y_max):
     if(y_max > image_ratio[1]):
         bounding_box[3] = image_ratio[1]
 
-    print(bounding_box)
-
     return True
 
 def random_initial_position():
@@ -90,7 +88,7 @@ def image_viewer(image):
 def creare_dataset(generated_image, image_ID, class_ID):
     global names_hist, bbox_hist, class_hist
     generated_image.save(define_image_name(image_ID))
-    names_hist.append(f"{image_ID}.png")
+    names_hist.append(f"{image_ID+1}.png")
     bbox_hist.append(f"{bounding_box[0]},{bounding_box[1]},{bounding_box[2]},{bounding_box[3]}")
     class_hist.append(class_ID)
 

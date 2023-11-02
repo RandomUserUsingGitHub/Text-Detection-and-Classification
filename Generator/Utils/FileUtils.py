@@ -48,4 +48,7 @@ def delete_old_dataset():
         if os.path.isfile(path):
             os.remove(path)
 
+def get_image_path(name):
+    current_folder_path = get_current_folder_path()
+    return os.path.join(current_folder_path, '..', 'Dataset', name)
 
