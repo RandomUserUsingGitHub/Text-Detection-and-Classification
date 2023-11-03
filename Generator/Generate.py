@@ -7,14 +7,14 @@ from arabic_reshaper import reshape
 from bidi.algorithm import get_display
 
 
-font_min = 20
-font_max = 70
+font_min = 10
+font_max = 15
 gray_level_max = 50
-image_ratio = [400,300]
-x_ofset = 100
-y_ofset = 50
-outer_left_text_spawn = -150
-outer_up_text_spawn = -50
+image_ratio = [200,200]
+x_ofset = 40
+y_ofset = 20
+outer_left_text_spawn = -70
+outer_up_text_spawn = -30
 bounding_box = [0, 0, 0, 0]
 
 names_hist = []
