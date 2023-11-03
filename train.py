@@ -5,7 +5,7 @@ from DataLoader import read_data
 
 
 def train_model():
-    (train_images, train_classes), (test_images, test_classes) = read_data()
+    (train_images, train_labels), (test_images, test_labels) = read_data()
 
     train_images = np.array(train_images, dtype=float)
     test_images = np.array(test_images, dtype=float)
@@ -29,6 +29,6 @@ def train_model():
     model.summary()
 
     model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
-    model.fit(train_images, train_classes, epochs=5)
+    model.fit(train_images, train_labels, epochs=5)
 
-    test_loss = model.evaluate(test_images, test_classes)
+    test_loss = model.evaluate(test_images, test_labels)

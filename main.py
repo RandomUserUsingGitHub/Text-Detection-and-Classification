@@ -13,7 +13,7 @@ def create_new_dataset():
         delete_old_dataset()
     else:
         raise SystemExit
-    delete_old_dataset()
+    # delete_old_dataset()
     print("Loading the texts...")
     text = loadText()
     amount = int(input("How many images? "))
