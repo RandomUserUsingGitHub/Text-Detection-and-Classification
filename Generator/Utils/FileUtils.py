@@ -52,3 +52,12 @@ def get_image_path(name):
     current_folder_path = get_current_folder_path()
     return os.path.join(current_folder_path, '..', 'Dataset', name)
 
+def get_model_path(name):
+    current_folder_path = get_current_folder_path()
+    return os.path.join(current_folder_path, '..', '..', 'Models', name)
+
+def list_models():
+    current_folder_path = get_current_folder_path()
+    path = os.path.join(current_folder_path, '..', '..', 'Models')
+    return os.listdir(path)
+
