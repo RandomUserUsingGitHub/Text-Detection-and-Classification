@@ -22,6 +22,8 @@ bbox_hist = []
 class_hist = []
 
 
+
+
 def calculate_true_box(x_min, y_min, x_max, y_max):
     global bounding_box
     offset = 20 # in pixels
@@ -102,6 +104,10 @@ def create_scv():
     }
     df = pd.DataFrame(data_dict)
     df.to_csv(define_csv_name(), index=False, sep=",")
+
+    df = pd.read_csv(define_csv_name())
+    df_shuffled = df.sample(frac=1, random_state=42)  # You can change the random_state for different shuffling
+    df_shuffled.to_csv(define_csv_name(), index=False)
 
 
 

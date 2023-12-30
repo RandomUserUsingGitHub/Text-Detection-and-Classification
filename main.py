@@ -14,6 +14,9 @@ def check_answer(inputt):
         return False
 
 def create_new_dataset():
+    user_input = input("Create new dataset? (y/n) ")
+    if(not check_answer(user_input)):
+        return
     delete_dataset = input("DELETE ALL PREVIOUS FILES? (y/n) ")
     if(check_answer(delete_dataset)):
         delete_old_dataset()
@@ -26,16 +29,9 @@ def create_new_dataset():
     generator(text, amount=amount)
 
 
-def main():
-    create_dataset = input("Create new dataset? (y/n) ")
-    if(check_answer(create_dataset)):
-        create_new_dataset()
-
-       
+def main():      
     # create_new_dataset()
-    
     train_model()
-
 
 
 
