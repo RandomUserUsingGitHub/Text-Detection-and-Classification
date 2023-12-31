@@ -8,7 +8,20 @@ train_data_percentage = 0.8
 validation_data_percentage = 0.1
 test_data_percentage = 0.1
 
-def read_data():
+# train_images = images[:len_train]
+# train_labels = labels[:len_train]
+# train_Bboxes = bboxes[:len_train]
+
+# validation_images = images[len_train:len_train+len_validation]
+# validation_labels = labels[len_train:len_train+len_validation]
+# validation_Bboxes = bboxes[len_train:len_train+len_validation]
+
+test_images = []
+test_labels = []
+test_Bboxes = []
+
+
+def load_data():
     df = pd.read_csv(define_csv_name())
     images_IDs = df["Image_ID"]
     labels = df["Class_Label"]
@@ -20,67 +33,52 @@ def read_data():
         images_in_numpy.append(np.array(image))
 
     Bboxes_in_integer = [[int(integer) for integer in bbox.split(',')] for bbox in Bboxes]
-
-    # images_in_numpy = np.array(images_in_numpy)
-    # labels_in_numpy = np.array(labels)
-    # Bboxes_in_numpy = Bboxes_in_integer.to_numpy()
-
     Bboxes_in_numpy = Bboxes_in_integer
     labels_in_numpy = labels.to_numpy()
 
-    len_dataset = int(len(labels_in_numpy))
+    return images_in_numpy, Bboxes_in_integer, labels_in_numpy
+
+def get_train_data():
+    images, bboxes, labels = load_data()
+
+   
+
+    len_dataset = int(len(labels))
     len_train = int(len_dataset * train_data_percentage)
     len_validation = int(len_dataset * validation_data_percentage)
 
-    print(type(images_in_numpy), type(Bboxes_in_numpy), type(labels_in_numpy))
+    train_images = images[:len_train]
+    train_labels = labels[:len_train]
+    train_Bboxes = bboxes[:len_train]
+
+    validation_images = images[len_train:len_train+len_validation]
+    validation_labels = labels[len_train:len_train+len_validation]
+    validation_Bboxes = bboxes[len_train:len_train+len_validation]
+
+    train_images = np.array(train_images, dtype=float)
+    validation_images = np.array(validation_images, dtype=float)
+
+    train_images = train_images / 255.0
+    validation_images = validation_images / 255.0
 
 
-    
-
-# #   eng
-#     train_images_eng = images_in_numpy[:len_train]
-#     test_images_eng = images_in_numpy[len_train:len_dataset]
-#     train_labels_eng = labels_in_numpy[:len_train]
-#     test_labels_eng = labels_in_numpy[len_train:len_dataset]
-#     train_Bboxes_eng = Bboxes_in_numpy[:len_train]
-#     test_Bboxes_eng = Bboxes_in_numpy[len_train:len_dataset]
+    return (train_images, train_labels, train_Bboxes), (validation_images, validation_labels, validation_Bboxes)
 
 
-# #   pes
-#     train_images_pes = images_in_numpy[len_dataset:len_train + len_dataset]
-#     test_images_pes = images_in_numpy[len_train + len_dataset:]
-#     train_labels_pes = labels_in_numpy[len_dataset:len_train + len_dataset]
-#     test_labels_pes = labels_in_numpy[len_train + len_dataset:]
-#     train_Bboxes_pes = Bboxes_in_numpy[len_dataset:len_train + len_dataset]
-#     test_Bboxes_pes = Bboxes_in_numpy[len_train + len_dataset:]
-
-# #   merge
-#     #   eng
-#     train_images = train_images_eng + train_images_pes
-#     test_images = test_images_eng + test_images_pes
-#     train_labels = np.concatenate((train_labels_eng, train_labels_pes))
-#     test_labels = np.concatenate((test_labels_eng, test_labels_pes))
-#     train_Bboxes = np.concatenate((train_Bboxes_eng, train_Bboxes_pes))
-#     test_Bboxes = np.concatenate((test_Bboxes_eng, test_Bboxes_pes))
-
-
-    train_images = images_in_numpy[:len_train]
-    train_labels = labels_in_numpy[:len_train]
-    train_Bboxes = Bboxes_in_numpy[:len_train]
-
-    validation_images = images_in_numpy[len_train:len_train+len_validation]
-    validation_labels = labels_in_numpy[len_train:len_train+len_validation]
-    validation_Bboxes = Bboxes_in_numpy[len_train:len_train+len_validation]
-
-    test_images = images_in_numpy[len_train+len_validation:len_dataset]
-    test_labels = labels_in_numpy[len_train+len_validation:len_dataset]
-    test_Bboxes = Bboxes_in_numpy[len_train+len_validation:len_dataset]
-
-    return (train_images, train_labels, train_Bboxes), (validation_images, validation_labels, validation_Bboxes), (test_images, test_labels, test_Bboxes)
+def get_test_data():
+    images, bboxes, labels = load_data()
+    len_dataset = int(len(labels))
+    len_test = int(len_dataset * test_data_percentage)
+    len_train = int(len_dataset * train_data_percentage)
+    len_validation = int(len_dataset * validation_data_percentage)
 
     
-    # index = 1
-    # np.set_printoptions(linewidth=320)
-    # print(f'LABEL: {labels_in_numpy[index]}')
-    # print(f'\nIMAGE PIXEL ARRAY:\n {images_in_numpy[index]}')
+    test_images = images[len_train+len_validation:len_dataset]
+    test_labels = labels[len_train+len_validation:len_dataset]
+    test_Bboxes = bboxes[len_train+len_validation:len_dataset]
+
+    test_images = np.array(test_images, dtype=float)
+    test_images = test_images / 255.0
+
+    return (test_images, test_labels, test_Bboxes)
 

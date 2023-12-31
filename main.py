@@ -1,24 +1,24 @@
 from Generator.LoadText import loadText
 from Generator.Generate import generator
-from Generator.Utils.FileUtils import delete_old_dataset, get_model_path, list_models
+from Generator.Utils.FileUtils import delete_old_dataset
 from train import train_model
+from eval import evaluate_model
 # from DataLoader import parse_csv_row
 
 import warnings
 
 
-def check_answer(inputt):
-    if('y' in inputt.lower()):
+def check_answer(message):
+    user_input = input(message)
+    if('y' in user_input.lower()):
         return True
     else:
         return False
 
 def create_new_dataset():
-    user_input = input("Create new dataset? (y/n) ")
-    if(not check_answer(user_input)):
+    if(not check_answer("Create new dataset? (y/n) ")):
         return
-    delete_dataset = input("DELETE ALL PREVIOUS FILES? (y/n) ")
-    if(check_answer(delete_dataset)):
+    if(check_answer("DELETE ALL PREVIOUS FILES? (y/n) ")):
         delete_old_dataset()
     else:
         raise SystemExit
@@ -31,7 +31,12 @@ def create_new_dataset():
 
 def main():      
     # create_new_dataset()
-    train_model()
+
+    if(check_answer("Train a model? (y/n) ")):
+        train_model()
+
+    if(check_answer("Evaluate a model? (y/n) ")):
+        evaluate_model()
 
 
 
