@@ -8,6 +8,8 @@ train_data_percentage = 0.8
 validation_data_percentage = 0.1
 test_data_percentage = 0.1
 
+bbox_norm_value = 200
+
 # train_images = images[:len_train]
 # train_labels = labels[:len_train]
 # train_Bboxes = bboxes[:len_train]
@@ -33,10 +35,10 @@ def load_data():
         images_in_numpy.append(np.array(image))
 
     Bboxes_in_integer = [[int(integer) for integer in bbox.split(',')] for bbox in Bboxes]
-    Bboxes_in_numpy = Bboxes_in_integer
+    Bboxes_in_numpy = np.array(Bboxes_in_integer) / bbox_norm_value
     labels_in_numpy = labels.to_numpy()
 
-    return images_in_numpy, Bboxes_in_integer, labels_in_numpy
+    return images_in_numpy, Bboxes_in_numpy, labels_in_numpy
 
 def get_train_data():
     images, bboxes, labels = load_data()
@@ -58,8 +60,8 @@ def get_train_data():
     train_images = np.array(train_images, dtype=float)
     validation_images = np.array(validation_images, dtype=float)
 
-    train_images = train_images / 255.0
-    validation_images = validation_images / 255.0
+    train_images = train_images / 255
+    validation_images = validation_images / 255
 
 
     return (train_images, train_labels, train_Bboxes), (validation_images, validation_labels, validation_Bboxes)
@@ -78,7 +80,7 @@ def get_test_data():
     test_Bboxes = bboxes[len_train+len_validation:len_dataset]
 
     test_images = np.array(test_images, dtype=float)
-    test_images = test_images / 255.0
+    test_images = test_images / 255
 
     return (test_images, test_labels, test_Bboxes)
 
