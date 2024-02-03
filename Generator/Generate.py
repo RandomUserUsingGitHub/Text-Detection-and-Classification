@@ -1,6 +1,7 @@
 from .TextDataset.Languages import classes
 from .Utils.FileUtils import get_font_file_path, get_backgrounds_file_path, find_files, define_image_name, define_csv_name
 from .Utils.RandomUtils import random_choice, random_number
+from .Utils.DataSpliter import split_data
 
 from PIL import Image, ImageDraw, ImageFont
 from arabic_reshaper import reshape
@@ -106,8 +107,10 @@ def create_scv():
     df.to_csv(define_csv_name(), index=False, sep=",")
 
     df = pd.read_csv(define_csv_name())
-    df_shuffled = df.sample(frac=1, random_state=42)  # You can change the random_state for different shuffling
+    df_shuffled = df.sample(frac=1, random_state=42)  
     df_shuffled.to_csv(define_csv_name(), index=False)
+    split_data()
+    
 
 
 

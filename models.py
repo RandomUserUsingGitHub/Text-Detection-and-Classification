@@ -50,6 +50,63 @@ def calculate_single_iou(pred_bbox, true_bbox):
 
     return iou
 
+
+###############################################################################################################
+###############################################################################################################
+
+
+class IoUCallback2(tf.keras.callbacks.Callback):
+    def __init__(self, generator):
+        super(IoUCallback2, self).__init__()
+        self.generator = generator
+
+    def on_epoch_end(self, epoch, logs=None):
+        # Compute IoU on the validation set
+        iou = self.compute_iou()
+        
+        # Log the IoU value
+        logs["iou"] = iou
+        print(f"IoU: {iou}")
+
+    def compute_iou(self):
+        iou_values = []
+        for batch in range(len(self.generator)):
+            images, true_bboxes, true_labels = self.generator[batch]
+            
+            predicted_results = self.model.predict(images)
+
+            # If you have separate arrays for bounding boxes and labels, you can unpack them
+            predicted_bboxes, predicted_labels = predicted_results
+            
+            
+            # Compute IoU for each example in the batch
+            batch_iou = self.compute_batch_iou(true_bboxes, predicted_bboxes)
+            iou_values.append(batch_iou)
+        
+        # Average IoU over all batches
+        mean_iou = np.mean(iou_values)
+        return mean_iou
+
+    def compute_batch_iou(self, true_bboxes, predicted_bboxes):
+        # Extract coordinates from bounding boxes
+        x1_true, y1_true, x2_true, y2_true = true_bboxes[:, 0], true_bboxes[:, 1], true_bboxes[:, 2], true_bboxes[:, 3]
+        x1_pred, y1_pred, x2_pred, y2_pred = predicted_bboxes[:, 0], predicted_bboxes[:, 1], predicted_bboxes[:, 2], predicted_bboxes[:, 3]
+
+        # Calculate intersection area
+        intersection_area = np.maximum(0.0, np.minimum(x2_true, x2_pred) - np.maximum(x1_true, x1_pred)) * np.maximum(0.0, np.minimum(y2_true, y2_pred) - np.maximum(y1_true, y1_pred))
+
+        # Calculate union area
+        area_true = (x2_true - x1_true) * (y2_true - y1_true)
+        area_pred = (x2_pred - x1_pred) * (y2_pred - y1_pred)
+        union_area = area_true + area_pred - intersection_area
+
+        # Calculate IoU
+        iou = intersection_area / np.maximum(union_area, 1e-10)  # Avoid division by zero
+        mean_batch_iou = np.mean(iou)
+
+        return mean_batch_iou
+
+
     
 
 ###############################################################################################################

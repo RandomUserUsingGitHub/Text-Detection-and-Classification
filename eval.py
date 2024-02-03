@@ -1,7 +1,7 @@
 import tensorflow as tf
 from models import calculate_iou, calculate_single_iou
 from Generator.Utils.FileUtils import get_model_path, list_models
-from DataLoader import get_test_data
+from DataLoader import load
 import cv2
 import numpy as np
 import time
@@ -36,7 +36,7 @@ def visualize_bboxes(image, true_bbox, pred_bbox, prediction_label):
     
 
 def evaluate_model():
-    (test_images, test_labels, test_Bboxes) = get_test_data()
+    (test_images, test_labels, test_Bboxes) = load("test")
 
     files = []
     print("List of models: ")

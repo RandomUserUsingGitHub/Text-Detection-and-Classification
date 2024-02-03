@@ -32,15 +32,20 @@ def find_files(path, file_extensions):
 
 def define_csv_name():
     current_folder_path = get_current_folder_path()
-    return os.path.join(current_folder_path, '..', 'Dataset', 'data.csv')
+    return os.path.join(current_folder_path, '..', 'Dataset', 'pics', 'data.csv')
+
+def define_splitted_name(name):
+    current_folder_path = get_current_folder_path()
+    name = name + ".csv"
+    return os.path.join(current_folder_path, '..', 'Dataset', name)
 
 def define_image_name(label):
     current_folder_path = get_current_folder_path()
-    return os.path.join(current_folder_path, '..', 'Dataset', f'{label+1}.png')
+    return os.path.join(current_folder_path, '..', 'Dataset', 'pics', f'{label+1}.png')
 
 def delete_old_dataset():
     current_folder_path = get_current_folder_path()
-    generated_path = os.path.join(current_folder_path, '..', 'Dataset')
+    generated_path = os.path.join(current_folder_path, '..', 'Dataset', 'pics')
     files = os.listdir(generated_path)
 
     for file in files:
@@ -50,7 +55,7 @@ def delete_old_dataset():
 
 def get_image_path(name):
     current_folder_path = get_current_folder_path()
-    return os.path.join(current_folder_path, '..', 'Dataset', name)
+    return os.path.join(current_folder_path, '..', 'Dataset', 'pics', name)
 
 def get_model_path(name):
     current_folder_path = get_current_folder_path()
