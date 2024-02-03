@@ -27,7 +27,7 @@ def train_model():
 
     instance.model.compile(
         optimizer='adam',
-        loss={'bbox_output': tf.keras.losses.Huber(delta=2.0), 'cls_output': 'binary_crossentropy'},
+        loss={'bbox_output': 'mean_squared_error', 'cls_output': 'binary_crossentropy'},
         metrics={'bbox_output': 'mae', 'cls_output': 'accuracy'}
         )
 
@@ -38,7 +38,7 @@ def train_model():
     instance.model.fit(
         np.array(train_images),
         {'bbox_output': np.array(train_Bboxes), 'cls_output': np.array(train_labels)},
-        epochs=10,
+        epochs=20,
         batch_size=batch_size,
         validation_data=(validation_images, {'bbox_output' : np.array(validation_Bboxes), 'cls_output' : np.array(validation_labels)}),
         callbacks=[IoU_callback]

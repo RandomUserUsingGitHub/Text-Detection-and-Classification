@@ -83,7 +83,7 @@ class CustomModel:
         cls_output = tf.keras.layers.Dense(1, activation='sigmoid', name='cls_output')(cls_fc2)
 
         return tf.keras.Model(inputs=self.input_layer, outputs=[bbox_output, cls_output])
-    
+
 
     def model_2(self):
         input_from_backbone = self.backbone_1()
@@ -97,9 +97,22 @@ class CustomModel:
         cls_output = tf.keras.layers.Dense(1, activation='sigmoid', name='cls_output')(cls_fc2)
 
         return tf.keras.Model(inputs=self.input_layer, outputs=[bbox_output, cls_output])
+    
 
+    def model_3(self):
+        input_from_backbone = self.backbone_1()
+        
+        bbox_fc1 = tf.keras.layers.Dense(256, activation='relu')(input_from_backbone)
+        bbox_fc2 = tf.keras.layers.Dense(128, activation='relu')(bbox_fc1)
+        bbox_fc3 = tf.keras.layers.Dense(64, activation='relu')(bbox_fc2)
+        bbox_fc4 = tf.keras.layers.Dense(32, activation='relu')(bbox_fc3)   
+        bbox_output = tf.keras.layers.Dense(4, activation='linear', name='bbox_output')(bbox_fc4)
 
+        cls_fc1 = tf.keras.layers.Dense(128, activation='relu')(input_from_backbone)
+        cls_fc2 = tf.keras.layers.Dense(64, activation='relu')(cls_fc1)
+        cls_output = tf.keras.layers.Dense(1, activation='sigmoid', name='cls_output')(cls_fc2)
 
+        return tf.keras.Model(inputs=self.input_layer, outputs=[bbox_output, cls_output])
 
 
 
