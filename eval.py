@@ -17,6 +17,8 @@ def visualize_bboxes(image, true_bbox, pred_bbox, prediction_label):
     true_bbox = np.array(true_bbox, dtype=int)
     pred_bbox = np.array(pred_bbox, dtype=int)
 
+    print(true_bbox, pred_bbox)
+
     x1, y1, x2, y2 = true_bbox
     cv2.rectangle(image, (x1, y1), (x2, y2), (0, 255, 0), 1)
 

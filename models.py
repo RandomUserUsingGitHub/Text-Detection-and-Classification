@@ -71,7 +71,14 @@ class IoUCallback2(tf.keras.callbacks.Callback):
     def compute_iou(self):
         iou_values = []
         for batch in range(len(self.generator)):
-            images, true_bboxes, true_labels = self.generator[batch]
+            batch_data = self.generator[batch]
+
+            
+            images = batch_data[0]
+            outputs = batch_data[1]
+
+            true_bboxes = outputs['bbox_output']
+            true_labels = outputs['cls_output']
             
             predicted_results = self.model.predict(images)
 

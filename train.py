@@ -44,9 +44,9 @@ def train_model():
     start_time = time.time()
     instance.model.fit_generator(generator=train_gen,
                                 validation_data=val_gen,
-                                epochs=2,
+                                epochs=10,
                                 use_multiprocessing=True,
-                                workers=1,
+                                workers=2,
                                 callbacks=[IoU_callback],
                                 verbose=1)
     end_time = time.time()

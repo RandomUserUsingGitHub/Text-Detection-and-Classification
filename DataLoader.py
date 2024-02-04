@@ -28,7 +28,7 @@ def load(set_name):
     print(Bboxes, type(Bboxes))
 
     Bboxes_in_integer = [[int(integer) for integer in bbox.split(',')] for bbox in Bboxes]
-    Bboxes_in_numpy = np.array(Bboxes_in_integer) / bbox_norm_value
+    Bboxes_in_numpy = np.array(Bboxes_in_integer)
     labels_in_numpy = labels.to_numpy()
 
     images_in_numpy = np.array(images_in_numpy, dtype=float)

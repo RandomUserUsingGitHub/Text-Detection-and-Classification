@@ -74,4 +74,5 @@ class DataGenerator(keras.utils.Sequence):
         # print("-> type bbox: ", type(bboxes_in_numpy))
         # print("-----------------------------------")
 
-        return images_norm, bboxes_in_numpy, labels_in_numpy
+        # return images_norm, bboxes_in_numpy, labels_in_numpy
+        return (images_norm, {'bbox_output': bboxes_in_numpy, 'cls_output': labels_in_numpy})
