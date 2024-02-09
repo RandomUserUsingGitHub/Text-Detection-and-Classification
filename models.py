@@ -80,7 +80,7 @@ class IoUCallback2(tf.keras.callbacks.Callback):
             true_bboxes = outputs['bbox_output']
             true_labels = outputs['cls_output']
             
-            predicted_results = self.model.predict(images)
+            predicted_results = self.model.predict(images, verbose=0)
 
             # If you have separate arrays for bounding boxes and labels, you can unpack them
             predicted_bboxes, predicted_labels = predicted_results
@@ -123,7 +123,7 @@ class IoUCallback2(tf.keras.callbacks.Callback):
 class CustomModel:
     def __init__(self):
         self.input_layer = tf.keras.Input(shape=(200, 200, 1))
-        self.model = self.model_1()
+        self.model = self.model_6()
         
     
     def backbone_1(self):
@@ -133,6 +133,67 @@ class CustomModel:
         maxpool2 = tf.keras.layers.MaxPooling2D((2, 2))(conv2)
         flatten = tf.keras.layers.Flatten()(maxpool2)
         return flatten
+
+
+    def backbone_2(self):
+        x = self.input_layer
+
+        x = tf.keras.layers.Conv2D(64, (3, 3), activation='relu', padding='same')(x)
+        x = tf.keras.layers.MaxPooling2D((2, 2))(x)
+
+        x = tf.keras.layers.Conv2D(128, (3, 3), activation='relu', padding='same')(x)
+        x = tf.keras.layers.MaxPooling2D((2, 2))(x)
+
+        x = tf.keras.layers.Conv2D(256, (3, 3), activation='relu', padding='same')(x)
+        x = tf.keras.layers.MaxPooling2D((2, 2))(x)
+
+        x = tf.keras.layers.Conv2D(512, (3, 3), activation='relu', padding='same')(x)
+        x = tf.keras.layers.MaxPooling2D((2, 2))(x)
+
+        x = tf.keras.layers.Flatten()(x)
+        return x
+    
+    
+    def backbone_3(self):
+        x = self.input_layer
+
+        x = tf.keras.layers.Conv2D(32, (3, 3), activation='relu', padding='same')(x)
+        x = tf.keras.layers.MaxPooling2D((2, 2))(x)
+        x = tf.keras.layers.Conv2D(16, (3, 3), activation='relu', padding='same')(x)
+
+        x = tf.keras.layers.Flatten()(x)
+        return x
+    
+
+    def backbone_4(self):
+        x = self.input_layer
+
+        x = tf.keras.layers.Conv2D(64, (3, 3), activation='relu', padding='same')(x)
+        x = tf.keras.layers.MaxPooling2D((2, 2))(x)
+        x = tf.keras.layers.Conv2D(64, (3, 3), activation='relu', padding='same')(x)
+        x = tf.keras.layers.MaxPooling2D((2, 2))(x)
+
+
+        x = tf.keras.layers.Flatten()(x)
+        return x
+    
+
+    def backbone_5(self):
+        x = self.input_layer
+
+        x = tf.keras.layers.Conv2D(128, (3, 3), activation='relu', padding='same')(x)
+        x = tf.keras.layers.MaxPooling2D((2, 2))(x)
+
+        x = tf.keras.layers.Conv2D(64, (3, 3), activation='relu', padding='same')(x)
+        x = tf.keras.layers.MaxPooling2D((2, 2))(x)
+
+        x = tf.keras.layers.Conv2D(32, (3, 3), activation='relu', padding='same')(x)
+        x = tf.keras.layers.MaxPooling2D((2, 2))(x)
+
+        x = tf.keras.layers.Flatten()(x)
+        return x
+    
+    
 
     def model_1(self):
         
@@ -164,7 +225,7 @@ class CustomModel:
     
 
     def model_3(self):
-        input_from_backbone = self.backbone_1()
+        input_from_backbone = self.backbone_3()
         
         bbox_fc1 = tf.keras.layers.Dense(256, activation='relu')(input_from_backbone)
         bbox_fc2 = tf.keras.layers.Dense(128, activation='relu')(bbox_fc1)
@@ -172,9 +233,57 @@ class CustomModel:
         bbox_fc4 = tf.keras.layers.Dense(32, activation='relu')(bbox_fc3)   
         bbox_output = tf.keras.layers.Dense(4, activation='linear', name='bbox_output')(bbox_fc4)
 
-        cls_fc1 = tf.keras.layers.Dense(128, activation='relu')(input_from_backbone)
-        cls_fc2 = tf.keras.layers.Dense(64, activation='relu')(cls_fc1)
+        cls_fc1 = tf.keras.layers.Dense(64, activation='relu')(input_from_backbone)
+        cls_fc2 = tf.keras.layers.Dense(32, activation='relu')(cls_fc1)
         cls_output = tf.keras.layers.Dense(1, activation='sigmoid', name='cls_output')(cls_fc2)
+
+        return tf.keras.Model(inputs=self.input_layer, outputs=[bbox_output, cls_output])
+    
+
+    def model_4(self):
+        input_from_backbone = self.backbone_4()
+        
+        bbox_fc1 = tf.keras.layers.Dense(256, activation='relu')(input_from_backbone)
+        bbox_fc2 = tf.keras.layers.Dense(256, activation='relu')(bbox_fc1)
+        bbox_fc3 = tf.keras.layers.Dense(128, activation='relu')(bbox_fc2)
+        bbox_fc4 = tf.keras.layers.Dense(64, activation='relu')(bbox_fc3)   
+        bbox_output = tf.keras.layers.Dense(4, activation='linear', name='bbox_output')(bbox_fc4)
+
+        cls_fc1 = tf.keras.layers.Dense(64, activation='relu')(input_from_backbone)
+        cls_fc2 = tf.keras.layers.Dense(32, activation='relu')(cls_fc1)
+        cls_output = tf.keras.layers.Dense(1, activation='sigmoid', name='cls_output')(cls_fc2)
+
+        return tf.keras.Model(inputs=self.input_layer, outputs=[bbox_output, cls_output])
+    
+
+    def model_5(self):
+        input_from_backbone = self.backbone_2()
+        
+        bbox_fc1 = tf.keras.layers.Dense(256, activation='relu')(input_from_backbone)
+        bbox_fc2 = tf.keras.layers.Dense(128, activation='relu')(bbox_fc1)
+        bbox_fc3 = tf.keras.layers.Dense(256, activation='relu')(bbox_fc2)
+        bbox_fc4 = tf.keras.layers.Dense(128, activation='relu')(bbox_fc3)
+        bbox_fc5 = tf.keras.layers.Dense(16, activation='relu')(bbox_fc4)   
+        bbox_output = tf.keras.layers.Dense(4, activation='linear', name='bbox_output')(bbox_fc5)
+
+        cls_fc1 = tf.keras.layers.Dense(64, activation='relu')(input_from_backbone)
+        cls_output = tf.keras.layers.Dense(1, activation='sigmoid', name='cls_output')(cls_fc1)
+
+        return tf.keras.Model(inputs=self.input_layer, outputs=[bbox_output, cls_output])
+
+
+    def model_6(self):
+        input_from_backbone = self.backbone_5()
+        
+        bbox_fc1 = tf.keras.layers.Dense(256, activation='relu')(input_from_backbone)
+        bbox_fc2 = tf.keras.layers.Dense(256, activation='relu')(bbox_fc1)
+        bbox_fc3 = tf.keras.layers.Dense(128, activation='relu')(bbox_fc2)
+        bbox_fc4 = tf.keras.layers.Dense(64, activation='relu')(bbox_fc3)
+        bbox_fc5 = tf.keras.layers.Dense(16, activation='relu')(bbox_fc4)   
+        bbox_output = tf.keras.layers.Dense(4, activation='linear', name='bbox_output')(bbox_fc5)
+
+        cls_fc1 = tf.keras.layers.Dense(64, activation='relu')(input_from_backbone)
+        cls_output = tf.keras.layers.Dense(1, activation='sigmoid', name='cls_output')(cls_fc1)
 
         return tf.keras.Model(inputs=self.input_layer, outputs=[bbox_output, cls_output])
 

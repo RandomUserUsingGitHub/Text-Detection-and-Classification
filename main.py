@@ -3,6 +3,7 @@ from Generator.Generate import generator
 from Generator.Utils.FileUtils import delete_old_dataset
 from train import train_model
 from eval import evaluate_model
+from ScreenShotTester import test
 # from DataLoader import parse_csv_row
 
 import warnings
@@ -37,6 +38,9 @@ def main():
 
     if(check_answer("Evaluate a model? (y/n) ")):
         evaluate_model()
+
+    # if(check_answer("Test a model? (y/n) ")):
+    #     test()
 
 
 

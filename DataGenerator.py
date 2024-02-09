@@ -48,7 +48,7 @@ class DataGenerator(keras.utils.Sequence):
 
         for i, data_index in enumerate(indices):
             image = Image.open(get_image_path(self.images[data_index]))
-            image = image.resize(self.output_size)
+            # image = image.resize(self.output_size)
             
             # images[data_index] = (np.array(image))
             # bboxes[data_index] = (self.Bboxes[data_index])

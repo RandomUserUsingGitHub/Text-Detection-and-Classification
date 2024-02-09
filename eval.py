@@ -5,8 +5,13 @@ from DataLoader import load
 import cv2
 import numpy as np
 import time
+from DataGenerator import DataGenerator
+from train import iou
+
 
 bbox_norm_value = 200
+batch_size = 20
+
 
 
 def visualize_bboxes(image, true_bbox, pred_bbox, prediction_label):
@@ -17,7 +22,8 @@ def visualize_bboxes(image, true_bbox, pred_bbox, prediction_label):
     true_bbox = np.array(true_bbox, dtype=int)
     pred_bbox = np.array(pred_bbox, dtype=int)
 
-    print(true_bbox, pred_bbox)
+    print("true: ", true_bbox)
+    print("pred: ", pred_bbox)
 
     x1, y1, x2, y2 = true_bbox
     cv2.rectangle(image, (x1, y1), (x2, y2), (0, 255, 0), 1)
@@ -34,11 +40,34 @@ def visualize_bboxes(image, true_bbox, pred_bbox, prediction_label):
     cv2.imshow('Image with Bounding Boxes', image)
     
             
-        
+
+
+def accuracy(model, images, true_bboxes, true_labels):
+    for i in range(len(images)):
+        reshaped_image = np.expand_dims(images[i], axis=0)
+        start = time.time()
+        bbox, prediction = model.predict(reshaped_image)
+        end = time.time()
+
+
+        binary_prediction = 1 if prediction[0] >= 0.5 else 0
+
+        print(f"True Label: {true_labels[i]}, Predicted Label: {binary_prediction}")
+        # print(f"True Bbox: {true_bboxes[i] * bbox_norm_value}, Predicted Bbox: {bbox[0] * bbox_norm_value}")
+        # print("-> Prediction time = ", (end - start)*1000, " ms\n")
+        visualize_bboxes(images[i], true_bboxes[i] * bbox_norm_value, bbox[0] * bbox_norm_value, binary_prediction)
+        print(f"IoU = {calculate_single_iou((true_bboxes[i] * bbox_norm_value), np.array(bbox[0]) * bbox_norm_value)}\n")
+        key = cv2.waitKey(0)
+        if key == ord('q') or key == ord('Q'):
+            return False
+        return True
     
 
 def evaluate_model():
-    (test_images, test_labels, test_Bboxes) = load("test")
+    # (test_images, test_labels, test_Bboxes) = load("test")
+    test_gen = DataGenerator("test", batch_size=batch_size)
+
+
 
     files = []
     print("List of models: ")
@@ -48,51 +77,34 @@ def evaluate_model():
     inp = int(input("-> "))
     name = files[inp-1]
     path = get_model_path(name)
-    model = tf.keras.models.load_model(path)
+    model = tf.keras.models.load_model(path, custom_objects={'iou': iou})
 
-    model.evaluate(np.array(test_images), {'bbox_output': np.array(test_Bboxes), 'cls_output': np.array(test_labels)})
+    model.evaluate(test_gen)
 
-    y_pred = model.predict(test_images)
+    ious = []
+    for i in range(len(test_gen)):
+        batch_data = test_gen[i]
+        images = batch_data[0]
+        outputs = batch_data[1]
 
-    iou = calculate_iou(test_Bboxes * bbox_norm_value, y_pred[0] * bbox_norm_value)
+        true_bboxes = outputs['bbox_output']
+        true_labels = outputs['cls_output']
+        y_pred = model.predict(images, verbose=0)
+        print(f"{i+1}/{len(test_gen)}")
+        ious.append(calculate_iou(true_bboxes * bbox_norm_value, y_pred[0] * bbox_norm_value))
 
-    print("Bbox accuracy = ", iou)
+    print("Bbox accuracy = ", np.mean(ious))
 
-    # total_time = []
-    # for i in range(len(test_images)):
-    #     reshaped_image = np.expand_dims(test_images[i], axis=0)
-    #     start = time.time()
-    #     bbox, prediction = model.predict(reshaped_image)
-    #     end = time.time()
+ 
+    for i in range(len(test_gen)):
+        batch_data = test_gen[i]
+        images = batch_data[0]
+        outputs = batch_data[1]
 
-    #     if(i > 0):
-    #         total_time.append(end - start)
-    #     print(f"Sample {i+1}/{len(test_images)}")
-
-    # average_time = np.mean(total_time)
-    # print("-> Average time = ", (average_time)*1000, " ms")
-    
-    
-    for i in range(len(test_images)):
-        reshaped_image = np.expand_dims(test_images[i], axis=0)
-        start = time.time()
-        bbox, prediction = model.predict(reshaped_image)
-        print(bbox[0])
-        print(test_Bboxes[i])
-        end = time.time()
-
-
-        binary_prediction = 1 if prediction[0] >= 0.5 else 0
-
-        print(f"Sample {i + 1}:\nTrue Label: {test_labels[i]}, Predicted Label: {binary_prediction}")
-        print(f"True Bbox: {test_Bboxes[i] * bbox_norm_value}, Predicted Bbox: {bbox[0] * bbox_norm_value}")
-        print(f"IoU = {calculate_single_iou((test_Bboxes[i] * bbox_norm_value), np.array(bbox[0]) * bbox_norm_value)}")
-        print("-> Prediction time = ", (end - start)*1000, " ms\n")
-
-        visualize_bboxes(test_images[i], test_Bboxes[i] * bbox_norm_value, bbox[0] * bbox_norm_value, binary_prediction)
-        key = cv2.waitKey(0)
-        if key == ord('q') or key == ord('Q'):
-            return
+        true_bboxes = outputs['bbox_output']
+        true_labels = outputs['cls_output']
+        if accuracy(model, images, true_bboxes, true_labels) == False:
+            break
     cv2.destroyAllWindows()
 
 

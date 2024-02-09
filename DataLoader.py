@@ -31,7 +31,7 @@ def load(set_name):
     Bboxes_in_numpy = np.array(Bboxes_in_integer)
     labels_in_numpy = labels.to_numpy()
 
-    images_in_numpy = np.array(images_in_numpy, dtype=float)
+    images_in_numpy = np.array(images_in_numpy, dtype=float)    
     images_norm = images_in_numpy / image_norm_value
     bboxes_norm = Bboxes_in_numpy / bbox_norm_value
 
