@@ -5,20 +5,13 @@ import time
 
 from DataGenerator import DataGenerator
 from Generator.Utils.FileUtils import get_model_path
-from models import CustomModel, IoUCallback, IoUCallback2
+from models import CustomModel, IoUCallback, IoUCallback2, CustomWeightedLoss, giou_loss
 
 
-batch_size = 40
+batch_size = 10
 
 
-def iou(y_true, y_pred):
-    y_true = tf.keras.backend.flatten(y_true)
-    y_pred = tf.keras.backend.flatten(y_pred)
-    y_true_f = tf.cast(y_true, tf.float32)
-    y_pred_f = tf.cast(y_pred, tf.float32)
-    intersection = tf.keras.backend.sum(y_true_f * y_pred_f)
-    union = tf.keras.backend.sum(y_true_f) + tf.keras.backend.sum(y_pred_f) - intersection
-    return (intersection + 1e-7) / (union + 1e-7)
+
 
 
 
@@ -39,8 +32,8 @@ def train_model():
     # tf.keras.optimizers.Adam()
     instance.model.compile(
         optimizer='adam',
-        loss={'bbox_output': 'mean_squared_error', 'cls_output': 'binary_crossentropy'},
-        metrics={'bbox_output': iou, 'cls_output': 'accuracy'}
+        loss={'bbox_output': giou_loss, 'cls_output': 'binary_crossentropy'},
+        metrics={'bbox_output': 'mse', 'cls_output': 'accuracy'}
         )
     
     train_gen = DataGenerator("train", batch_size=batch_size)
@@ -57,8 +50,8 @@ def train_model():
     history =instance.model.fit_generator(generator=train_gen,
                                 validation_data=val_gen,
                                 epochs=15,
-                                use_multiprocessing=False,
-                                workers=1,
+                                use_multiprocessing=True,
+                                workers=5,
                                 callbacks=[IoU_callback],
                                 verbose=1)
     end_time = time.time()

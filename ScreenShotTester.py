@@ -1,5 +1,5 @@
 import tensorflow as tf
-from models import calculate_iou, calculate_single_iou
+from models import calculate_iou, calculate_single_iou, giou_loss
 from Generator.Utils.FileUtils import get_model_path, list_models
 from DataLoader import load
 import cv2
@@ -81,7 +81,7 @@ def test():
     inp = int(input("-> "))
     name = files[inp-1]
     path = get_model_path(name)
-    model = tf.keras.models.load_model(path)
+    model = tf.keras.models.load_model(path, custom_objects = {'giou_loss': giou_loss})
 
     read_clipboard(model)
     cv2.destroyAllWindows()

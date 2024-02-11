@@ -1,12 +1,11 @@
 import tensorflow as tf
-from models import calculate_iou, calculate_single_iou
+from models import calculate_iou, calculate_single_iou, giou_loss
 from Generator.Utils.FileUtils import get_model_path, list_models
 from DataLoader import load
 import cv2
 import numpy as np
 import time
 from DataGenerator import DataGenerator
-from train import iou
 
 
 bbox_norm_value = 200
@@ -77,7 +76,7 @@ def evaluate_model():
     inp = int(input("-> "))
     name = files[inp-1]
     path = get_model_path(name)
-    model = tf.keras.models.load_model(path, custom_objects={'iou': iou})
+    model = tf.keras.models.load_model(path, custom_objects={'giou_loss': giou_loss})
 
     model.evaluate(test_gen)
 

@@ -39,8 +39,8 @@ def main():
     if(check_answer("Evaluate a model? (y/n) ")):
         evaluate_model()
 
-    # if(check_answer("Test a model? (y/n) ")):
-    #     test()
+    if(check_answer("Test a model? (y/n) ")):
+        test()
 
 
 

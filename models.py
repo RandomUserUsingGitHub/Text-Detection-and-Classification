@@ -6,6 +6,78 @@ import numpy as np
 bbox_norm_value = 200
 
 
+
+
+def giou_loss(y_true, y_pred):
+    """
+    Calculate Generalized Intersection over Union (GIoU) loss between predicted and ground truth bounding boxes.
+    
+    Arguments:
+    y_true -- true bounding boxes, tensor of shape (batch_size, 4)
+    y_pred -- predicted bounding boxes, tensor of shape (batch_size, 4)
+    
+    Returns:
+    GIoU loss
+    """
+    # Extract coordinates of true and predicted boxes
+    true_x1, true_y1, true_x2, true_y2 = tf.split(y_true, 4, axis=-1)
+    pred_x1, pred_y1, pred_x2, pred_y2 = tf.split(y_pred, 4, axis=-1)
+    
+    # Calculate intersection coordinates
+    inter_x1 = tf.maximum(true_x1, pred_x1)
+    inter_y1 = tf.maximum(true_y1, pred_y1)
+    inter_x2 = tf.minimum(true_x2, pred_x2)
+    inter_y2 = tf.minimum(true_y2, pred_y2)
+    
+    # Calculate intersection area
+    inter_area = tf.maximum(inter_x2 - inter_x1, 0) * tf.maximum(inter_y2 - inter_y1, 0)
+    
+    # Calculate union area
+    true_area = (true_x2 - true_x1) * (true_y2 - true_y1)
+    pred_area = (pred_x2 - pred_x1) * (pred_y2 - pred_y1)
+    union_area = true_area + pred_area - inter_area
+    
+    # Calculate GIoU
+    iou = inter_area / tf.maximum(union_area, 1e-6)
+    enclose_x1 = tf.minimum(true_x1, pred_x1)
+    enclose_y1 = tf.minimum(true_y1, pred_y1)
+    enclose_x2 = tf.maximum(true_x2, pred_x2)
+    enclose_y2 = tf.maximum(true_y2, pred_y2)
+    enclose_area = (enclose_x2 - enclose_x1) * (enclose_y2 - enclose_y1)
+    giou = iou - (enclose_area - union_area) / tf.maximum(enclose_area, 1e-6)
+    
+    # Return GIoU loss
+    return 1 - giou
+
+
+###############################################################################################################
+###############################################################################################################
+
+
+class CustomWeightedLoss(tf.keras.losses.Loss):
+    def __init__(self, bbox_weight, cls_weight, **kwargs):
+        super().__init__(**kwargs)
+        self.bbox_weight = bbox_weight
+        self.cls_weight = cls_weight
+
+    def call(self, y_true, y_pred):
+        # Define your binary cross-entropy loss
+        cls_loss = tf.keras.losses.binary_crossentropy(y_true[1], y_pred[1])
+
+        # Define your mean squared error loss
+        mse_loss = tf.keras.losses.mean_squared_error(y_true[0], y_pred[0])
+
+        # Apply weights
+        weighted_loss = (cls_loss * self.cls_weight) + (mse_loss * self.bbox_weight)
+
+        # Return the combined loss
+        return weighted_loss
+
+
+###############################################################################################################
+###############################################################################################################
+
+
 class IoUCallback(tf.keras.callbacks.Callback):
     def __init__(self, validation_data, model):
         super(IoUCallback, self).__init__()
@@ -123,7 +195,7 @@ class IoUCallback2(tf.keras.callbacks.Callback):
 class CustomModel:
     def __init__(self):
         self.input_layer = tf.keras.Input(shape=(200, 200, 1))
-        self.model = self.model_6()
+        self.model = self.model_5()
         
     
     def backbone_1(self):
@@ -181,14 +253,13 @@ class CustomModel:
     def backbone_5(self):
         x = self.input_layer
 
-        x = tf.keras.layers.Conv2D(128, (3, 3), activation='relu', padding='same')(x)
+        x = tf.keras.layers.Conv2D(64, (3, 3), activation='relu')(x)
         x = tf.keras.layers.MaxPooling2D((2, 2))(x)
 
-        x = tf.keras.layers.Conv2D(64, (3, 3), activation='relu', padding='same')(x)
-        x = tf.keras.layers.MaxPooling2D((2, 2))(x)
+        x = tf.keras.layers.Conv2D(32, (3, 3), activation='relu')(x)
+        x = tf.keras.layers.Conv2D(32, (3, 3), activation='relu')(x)
+        x = tf.keras.layers.MaxPooling2D((3, 3))(x)
 
-        x = tf.keras.layers.Conv2D(32, (3, 3), activation='relu', padding='same')(x)
-        x = tf.keras.layers.MaxPooling2D((2, 2))(x)
 
         x = tf.keras.layers.Flatten()(x)
         return x
@@ -257,7 +328,7 @@ class CustomModel:
     
 
     def model_5(self):
-        input_from_backbone = self.backbone_2()
+        input_from_backbone = self.backbone_3()
         
         bbox_fc1 = tf.keras.layers.Dense(256, activation='relu')(input_from_backbone)
         bbox_fc2 = tf.keras.layers.Dense(128, activation='relu')(bbox_fc1)
@@ -275,15 +346,13 @@ class CustomModel:
     def model_6(self):
         input_from_backbone = self.backbone_5()
         
-        bbox_fc1 = tf.keras.layers.Dense(256, activation='relu')(input_from_backbone)
-        bbox_fc2 = tf.keras.layers.Dense(256, activation='relu')(bbox_fc1)
-        bbox_fc3 = tf.keras.layers.Dense(128, activation='relu')(bbox_fc2)
-        bbox_fc4 = tf.keras.layers.Dense(64, activation='relu')(bbox_fc3)
-        bbox_fc5 = tf.keras.layers.Dense(16, activation='relu')(bbox_fc4)   
-        bbox_output = tf.keras.layers.Dense(4, activation='linear', name='bbox_output')(bbox_fc5)
+        x = tf.keras.layers.Dense(128, activation='relu')(input_from_backbone)
+        x = tf.keras.layers.Dense(64, activation='relu')(x)
+        x = tf.keras.layers.Dense(16, activation='relu')(x)   
+        bbox_output = tf.keras.layers.Dense(4, activation='linear', name='bbox_output')(x)
 
-        cls_fc1 = tf.keras.layers.Dense(64, activation='relu')(input_from_backbone)
-        cls_output = tf.keras.layers.Dense(1, activation='sigmoid', name='cls_output')(cls_fc1)
+        x = tf.keras.layers.Dense(32, activation='relu')(input_from_backbone)
+        cls_output = tf.keras.layers.Dense(1, activation='sigmoid', name='cls_output')(x)
 
         return tf.keras.Model(inputs=self.input_layer, outputs=[bbox_output, cls_output])
 
